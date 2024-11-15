@@ -1,7 +1,7 @@
 # run para dev.:
 #                 docker-compose up angular-dev
 # run para prod:
-#                 docker-compose up angular-prod
+#                 docker-compose up angular-prod --build -d
 services:
   angular-dev:
     container_name: main-dev
@@ -23,8 +23,6 @@ services:
     environment:
       - VIRTUAL_HOST=msdaniel.com.br
     volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
       - /etc/letsencrypt:/etc/letsencrypt
     restart: always
 
