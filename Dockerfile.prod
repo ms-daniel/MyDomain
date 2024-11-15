@@ -34,5 +34,8 @@ COPY apache-conf/mydomain.conf /usr/local/apache2/conf/extra/mydomain.conf
 # Incluir o arquivo de configuração customizado no httpd.conf
 RUN echo 'Include /usr/local/apache2/conf/extra/mydomain.conf' >> /usr/local/apache2/conf/httpd.conf
 
+# Habilitar o módulo mod_rewrite
+RUN sed -i '/#LoadModule rewrite_module modules\/mod_rewrite.so/s/^#//g' /usr/local/apache2/conf/httpd.conf
+
 # Expor as portas 80 e 443 (HTTP e HTTPS)
 EXPOSE 80 443
