@@ -1,0 +1,23 @@
+# Imagem base
+FROM node:18 AS dev-stage
+
+# Defina o diretório de trabalho dentro do contêiner
+WORKDIR /app
+
+# Copie os arquivos de configuração e de dependências
+COPY package*.json ./
+
+# instalar CLI do angular
+RUN npm install -g @angular/cli
+
+# Instale as dependências do projeto
+RUN npm install
+
+# Copie todos os arquivos do projeto para o contêiner
+COPY . .
+
+# Exponha a porta 4200 para desenvolvimento
+EXPOSE 4200
+
+# Comando para iniciar o servidor de desenvolvimento Angular
+CMD ["npm", "run", "start", "--", "--host=0.0.0.0"]

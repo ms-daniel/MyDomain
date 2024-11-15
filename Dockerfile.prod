@@ -1,0 +1,29 @@
+# Imagem base
+FROM node:18 AS build-stage
+
+# Defina o diretório de trabalho dentro do contêiner
+WORKDIR /app
+
+# Copie os arquivos de configuração e de dependências
+COPY package*.json ./
+
+# Instalar CLI do Angular
+RUN npm install -g @angular/cli
+
+# Instale as dependências do projeto
+RUN npm install
+
+# Copie todos os arquivos do projeto para o contêiner
+COPY . .
+
+# Execute a build do projeto Angular
+RUN npm run build --prod
+
+# Imagem para servir a aplicação com Apache
+FROM httpd:alpine AS production-stage
+
+# Copie os arquivos da build do Angular para o diretório padrão do Apache
+COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
+
+# Exponha a porta 80
+EXPOSE 80

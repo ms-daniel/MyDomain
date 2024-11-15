@@ -1,0 +1,22 @@
+# run para dev.:
+#                 docker-compose up angular-dev
+# run para prod:
+#                 docker-compose up angular-prod
+services:
+  angular-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4200:4200"
+    restart: always
+
+  angular-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    environment:
+      - VIRTUAL_HOST=msdanie.com.br
+    restart: always
