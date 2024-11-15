@@ -23,3 +23,14 @@ services:
     environment:
       - VIRTUAL_HOST=msdaniel.com.br
     restart: always
+
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    volumes:
+      - ./certbot-etc:/etc/letsencrypt
+      - ./certbot-var:/var/lib/letsencrypt
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew --webroot -w /var/lib/letsencrypt/; done;'
+    depends_on:
+      - angular-prod
+    restart: always
