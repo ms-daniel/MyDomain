@@ -34,6 +34,16 @@ services:
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --post-hook \"/renewal-hook.sh\"; sleep 12h & wait $${!}; done;'"
     restart: always
 
+  certbot-validation:
+    container_name: certbot-validation
+    image: httpd:alpine
+    volumes:
+      - ./certbot/www:/usr/local/apache2/htdocs
+    ports:
+      - "80:80"
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do apachectl -D FOREGROUND; sleep 12h & wait $${!}; done;'"
+    restart: "no"
+
   # a primeira vez que rodar o container e necessario gerar o certificado ao menos uma vez
   # esse comando precisar ser executado antes do container do angular prod
   # docker-compose run --rm certbot certonly --webroot --webroot-path=/var/www/certbot -d msdaniel.com.br
