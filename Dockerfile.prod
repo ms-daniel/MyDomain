@@ -1,4 +1,4 @@
-# Imagem base
+# Imagem base para build do Angular
 FROM node:18 AS build-stage
 
 # Defina o diretório de trabalho dentro do contêiner
@@ -22,13 +22,17 @@ RUN npm run build --prod
 # Imagem para servir a aplicação com Apache
 FROM httpd:alpine AS production-stage
 
-# Instalar Certbot
+# Instalar Certbot e utilitários necessários
 RUN apk add --no-cache certbot apache2-utils
+
+# Ativar o módulo SSL para o Apache
+RUN apk add --no-cache apache2 && \
+    sed -i '/#LoadModule ssl_module modules\/mod_ssl.so/s/^#//g' /usr/local/apache2/conf/httpd.conf
 
 # Copie os arquivos da build do Angular para o diretório padrão do Apache
 COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
 
-# Copiar o arquivo de configuração para o diretório de configuração do Apache
+# Copiar o arquivo de configuração do Apache
 COPY apache-conf/mydomain.conf /usr/local/apache2/conf/extra/mydomain.conf
 
 # Incluir o arquivo de configuração customizado no httpd.conf
