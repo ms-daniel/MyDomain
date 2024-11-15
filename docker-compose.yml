@@ -23,8 +23,6 @@ services:
     environment:
       - VIRTUAL_HOST=msdaniel.com.br
     restart: always
-    depends_on:
-      - certbot  # Certbot precisa ser iniciado antes do servidor
 
   certbot:
     container_name: certbot
@@ -32,20 +30,9 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+      - ./renewal-hook.sh:/renewal-hook.sh
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --post-hook \"/renewal-hook.sh\"; sleep 12h & wait $${!}; done;'"
     restart: always
-
-  # Comando de execução do Certbot
-  certbot-init:
-    container_name: certbot-init
-    image: certbot/certbot
-    command: certonly --webroot --webroot-path=/var/www/certbot -d msdaniel.com.br
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; certbot certonly --webroot --webroot-path=/var/www/certbot -d msdaniel.com.br'"
-    depends_on:
-      - angular-prod
 
   # a primeira vez que rodar o container e necessario gerar o certificado ao menos uma vez
   # esse comando precisar ser executado antes do container do angular prod
