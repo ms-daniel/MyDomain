@@ -22,13 +22,6 @@ RUN npm run build --prod
 # Imagem para servir a aplicação com Apache
 FROM httpd:alpine AS production-stage
 
-# Instalar Certbot e utilitários necessários
-RUN apk add --no-cache certbot apache2-utils
-
-# Ativar o módulo SSL para o Apache
-RUN apk add --no-cache apache2 && \
-    sed -i '/#LoadModule ssl_module modules\/mod_ssl.so/s/^#//g' /usr/local/apache2/conf/httpd.conf
-
 # Copie os arquivos da build do Angular para o diretório padrão do Apache
 COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
 
@@ -38,5 +31,5 @@ COPY apache-conf/mydomain.conf /usr/local/apache2/conf/extra/mydomain.conf
 # Incluir o arquivo de configuração customizado no httpd.conf
 RUN echo 'Include /usr/local/apache2/conf/extra/mydomain.conf' >> /usr/local/apache2/conf/httpd.conf
 
-# Expor a porta 80 e 443 (HTTP e HTTPS)
-EXPOSE 80 443
+# Expor a porta 80  (HTTP
+EXPOSE 80
