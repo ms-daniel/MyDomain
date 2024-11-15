@@ -22,6 +22,10 @@ RUN npm run build --prod
 # Imagem para servir a aplicação com Apache
 FROM httpd:alpine AS production-stage
 
+# Ativar o módulo MPM
+RUN apk add --no-cache apache2-utils \
+    && sed -i 's/#LoadModule mpm_event_module/LoadModule mpm_event_module/g' /usr/local/apache2/conf/httpd.conf
+
 # Copie os arquivos da build do Angular para o diretório padrão do Apache
 COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
 
