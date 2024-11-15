@@ -4,6 +4,7 @@
 #                 docker-compose up angular-prod
 services:
   angular-dev:
+    container_name: main-dev
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -12,6 +13,7 @@ services:
     restart: always
 
   angular-prod:
+    container_name: main-prod
     build:
       context: .
       dockerfile: Dockerfile.prod
