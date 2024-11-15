@@ -25,5 +25,8 @@ FROM httpd:alpine AS production-stage
 # Copie os arquivos da build do Angular para o diretório padrão do Apache
 COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
 
+# Copie o arquivo de configuração personalizado do Apache
+COPY apache-conf/mydomain.conf /usr/local/apache2/conf/httpd.conf
+
 # Exponha a porta 80
 EXPOSE 80
