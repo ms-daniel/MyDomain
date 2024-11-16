@@ -28,9 +28,9 @@ RUN apk add --no-cache certbot certbot-apache apache2-utils
 # Instalar Apache com suporte a SSL
 RUN apk add --no-cache apache2
 
-# Ativar o módulo SSL do Apache
-RUN sed -i '/#LoadModule ssl_module/s/^#//g' /etc/httpd/httpd.conf \
-    && sed -i '/#Include conf/extra/httpd-ssl.conf/s/^#//g' /etc/httpd/httpd.conf
+# Ativar o módulo SSL do Apache (no caminho correto)
+RUN sed -i '/#LoadModule ssl_module/s/^#//g' /usr/local/apache2/conf/httpd.conf \
+    && sed -i '/#Include conf/extra/httpd-ssl.conf/s/^#//g' /usr/local/apache2/conf/httpd.conf
 
 # Copie os arquivos da build do Angular para o diretório padrão do Apache
 COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
