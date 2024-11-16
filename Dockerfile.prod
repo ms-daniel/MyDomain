@@ -22,7 +22,7 @@ RUN npm run build --prod
 # Imagem para servir a aplicação com Nginx
 FROM nginx:latest AS production-stage
 
-# Instalar o Certbot
+# Instalar o Certbot e Cron
 RUN apt-get update && apt-get install -y certbot cron
 
 # Criar o diretório de destino para a build
@@ -43,10 +43,10 @@ COPY scripts/renew_certificates.sh /usr/local/bin/renew_certificates.sh
 RUN chmod +x /usr/local/bin/renew_certificates.sh
 
 # Adicionar o cron job para renovação do certificado
-RUN echo "0 0 * * 1 certbot renew --quiet" | crontab -
+RUN echo "0 0 * * 1 /usr/local/bin/renew_certificates.sh" | crontab -
 
 # Expor as portas 80 e 443
 EXPOSE 80 443
 
-# Iniciar o Nginx e executar a renovação do Certbot (caso necessário)
-CMD ["/bin/sh", "-c", "nginx -g 'daemon off;' & certbot certonly --webroot -w /var/www/certbot -d msdaniel.com.br --email ms_danniel@outlook.com --agree-tos --no-eff-email --non-interactive && crontab -l | { cat; echo '0 0 * * 1 certbot renew --quiet'; } | crontab - && nginx -g 'daemon off;'"]
+# Iniciar o Nginx
+CMD ["nginx", "-g", "daemon off;"]
