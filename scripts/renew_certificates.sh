@@ -3,5 +3,5 @@
 # Renova os certificados
 certbot renew --quiet
 
-# Reinicia o Apache para carregar os novos certificados
-docker exec -it main-prod apachectl -k graceful
+# Reinicia o Nginx para carregar os novos certificados
+nginx -s reload

@@ -50,3 +50,6 @@ EXPOSE 80 443
 
 # Iniciar o Nginx
 CMD ["nginx", "-g", "daemon off;"]
+
+# quando rodar o container pela primeira vez é necessario gerar o certificado:
+# certbot certonly --webroot -w /var/www/certbot -d msdaniel.com.br --email ms_danniel@outlook.com --agree-tos --no-eff-email
