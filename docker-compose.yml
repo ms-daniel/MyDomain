@@ -3,14 +3,14 @@
 # run para prod:
 #                 docker-compose up angular-prod --build -d
 services:
-  angular-dev:
-    container_name: main-dev
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    ports:
-      - "4200:4200"
-    restart: always
+  # angular-dev:
+  #   container_name: main-dev
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - "4200:4200"
+  #   restart: always
 
   angular-prod:
     container_name: main-prod
@@ -22,6 +22,8 @@ services:
       - "443:443"
     volumes:
       - ./certbot-var:/var/lib/letsencrypt
+      - ./certbot-etc:/etc/letsencrypt
+      - ./certbot-www:/var/www/certbot
     environment:
       - VIRTUAL_HOST=msdaniel.com.br
     restart: always
@@ -32,5 +34,6 @@ services:
     volumes:
       - ./certbot-etc:/etc/letsencrypt
       - ./certbot-var:/var/lib/letsencrypt
-    entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew --webroot -w /var/lib/letsencrypt/; done;'
+      - ./certbot-www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait ${!}; certbot renew --webroot -w /var/www/certbot/; done;'"
     restart: always
