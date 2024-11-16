@@ -19,26 +19,32 @@ COPY . .
 # Execute a build do projeto Angular
 RUN npm run build --prod
 
-# Imagem para servir a aplicação com Apache
-FROM httpd:latest AS production-stage
+# Imagem para servir a aplicação com Nginx
+FROM nginx:latest AS production-stage
 
-# Instalar Certbot, apache2-utils e outros pacotes necessários
-RUN apt-get update && apt-get install -y certbot apache2-utils
+# Instalar o Certbot
+RUN apt-get update && apt-get install -y certbot
 
-# Instalar Apache com suporte a SSL
-RUN apt-get install -y apache2
+# Criar o diretório de destino para a build
+RUN mkdir -p /var/www/main-site
 
-# Ativar o módulo SSL do Apache e configurar o SSL
-RUN a2enmod ssl && a2enmod rewrite
+# Copiar os arquivos da build do Angular para o novo diretório
+COPY --from=build-stage /app/dist/my-domain/browser /var/www/main-site
 
-# Copiar os arquivos da build do Angular para o diretório padrão do Apache
-COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
+# Copiar arquivo de configuração personalizado do Nginx (adicionando, não substituindo)
+COPY conf/main.conf /etc/nginx/conf.d/mydomain.conf
 
-# Copiar o arquivo de configuração do Apache
-COPY apache-conf/mydomain.conf /etc/apache2/sites-available/000-default.conf
+# Definir permissões apropriadas nos diretórios necessários
+#RUN chmod -R 755 /var/www/main-site /var/www/certbot && \
+#    chown -R nginx:nginx /var/www/main-site /var/www/certbot
+
+# Copiar o script de inicialização do Certbot (opcional, caso queira automatizar a renovação)
+COPY scripts/renew_certificates.sh /usr/local/bin/renew_certificates.sh
+RUN chmod +x /usr/local/bin/renew_certificates.sh
 
 # Expor as portas 80 e 443
 EXPOSE 80 443
 
-# Iniciar o Apache no modo foreground
-CMD ["httpd-foreground"]
+# Iniciar o Nginx e executar a renovação do Certbot (caso necessário)
+CMD ["nginx", "-g", "daemon off;"]
+
