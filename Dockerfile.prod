@@ -22,8 +22,15 @@ RUN npm run build --prod
 # Imagem para servir a aplicação com Apache
 FROM httpd:alpine AS production-stage
 
-# Instalar Certbot, módulos necessários e mod_ssl
-RUN apk add --no-cache certbot certbot-apache apache2-utils mod_ssl
+# Instalar Certbot, apache2-utils e outros pacotes necessários
+RUN apk add --no-cache certbot certbot-apache apache2-utils
+
+# Instalar Apache com suporte a SSL
+RUN apk add --no-cache apache2
+
+# Ativar o módulo SSL do Apache
+RUN sed -i '/#LoadModule ssl_module/s/^#//g' /etc/httpd/httpd.conf \
+    && sed -i '/#Include conf/extra/httpd-ssl.conf/s/^#//g' /etc/httpd/httpd.conf
 
 # Copie os arquivos da build do Angular para o diretório padrão do Apache
 COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
