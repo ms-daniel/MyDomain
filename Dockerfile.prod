@@ -19,27 +19,32 @@ COPY . .
 # Execute a build do projeto Angular
 RUN npm run build --prod
 
-# Imagem para servir a aplicação com Apache
-FROM httpd:alpine AS production-stage
+# Imagem para servir a aplicação com Apache (versão normal)
+FROM httpd:latest AS production-stage
 
 # Instalar Certbot, apache2-utils e outros pacotes necessários
-RUN apk add --no-cache certbot certbot-apache apache2-utils
+RUN apt-get update && apt-get install -y \
+    certbot \
+    apache2-utils \
+    && apt-get clean
 
-# Instalar Apache com suporte a SSL
-RUN apk add --no-cache apache2
-
-# Ativar o módulo SSL do Apache (no caminho correto)
-RUN sed -i '/#LoadModule ssl_module/s/^#//g' /usr/local/apache2/conf/httpd.conf \
-    && sed -i '/#Include conf/extra/httpd-ssl.conf/s/^#//g' /usr/local/apache2/conf/httpd.conf
+# Ativar o módulo SSL do Apache (no caminho correto para a versão normal)
+RUN sed -i '/#LoadModule ssl_module/s/^#//g' /etc/apache2/apache2.conf \
+    && sed -i '/#Include conf-available/ssl-params.conf/s/^#//g' /etc/apache2/apache2.conf
 
 # Copie os arquivos da build do Angular para o diretório padrão do Apache
 COPY --from=build-stage /app/dist/my-domain/browser /usr/local/apache2/htdocs/
 
 # Copiar o arquivo de configuração do Apache
-COPY apache-conf/mydomain.conf /usr/local/apache2/conf/extra/mydomain.conf
+COPY apache-conf/mydomain.conf /etc/apache2/sites-available/mydomain.conf
 
-# Incluir o arquivo de configuração customizado no httpd.conf
-RUN echo 'Include /usr/local/apache2/conf/extra/mydomain.conf' >> /usr/local/apache2/conf/httpd.conf
+# Ativar o site customizado e o módulo SSL
+RUN a2ensite mydomain.conf \
+    && a2enmod ssl \
+    && a2enmod rewrite
+
+# Reiniciar o Apache para aplicar as mudanças
+RUN service apache2 restart
 
 # Expor as portas 80 e 443
 EXPOSE 80 443
