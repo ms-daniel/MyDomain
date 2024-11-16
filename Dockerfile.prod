@@ -46,5 +46,4 @@ RUN chmod +x /usr/local/bin/renew_certificates.sh
 EXPOSE 80 443
 
 # Iniciar o Nginx e executar a renovação do Certbot (caso necessário)
-CMD ["nginx", "-g", "daemon off;"]
-
+CMD ["/bin/sh", "-c", "nginx -g 'daemon off;' & certbot certonly --webroot -w /var/www/certbot -d msdaniel.com.br --email ms_danniel@outlook.com --agree-tos --no-eff-email && crontab -l | { cat; echo '0 0 * * 1 certbot renew --quiet'; } | crontab - && nginx -g 'daemon off;'"]
