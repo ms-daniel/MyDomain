@@ -7,7 +7,7 @@ services:
   #   container_name: main-dev
   #   build:
   #     context: .
-  #     dockerfile: Dockerfile.dev
+  #     dockerfile: Dockerfiles/Dockerfile.dev
   #   ports:
   #     - "4200:4200"
   #   restart: always
@@ -16,7 +16,7 @@ services:
     container_name: main-prod
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfiles/Dockerfile.prod
     ports:
       - "80:80"
       - "443:443"
