@@ -32,14 +32,14 @@ RUN mkdir -p /var/www/main-site
 COPY --from=build-stage /app/dist/my-domain/browser /var/www/main-site
 
 # Copiar arquivo de configuração personalizado do Nginx (adicionando, não substituindo)
-COPY conf/main.conf /etc/nginx/conf.d/mydomain.conf
+COPY ./conf/main.conf /etc/nginx/conf.d/mydomain.conf
 
 # Definir permissões apropriadas nos diretórios necessários
 #RUN chmod -R 755 /var/www/main-site /var/www/certbot && \
 #    chown -R nginx:nginx /var/www/main-site /var/www/certbot
 
 # Copiar o script de inicialização do Certbot (opcional, caso queira automatizar a renovação)
-COPY scripts/renew_certificates.sh /usr/local/bin/renew_certificates.sh
+COPY ./scripts/renew_certificates.sh /usr/local/bin/renew_certificates.sh
 RUN chmod +x /usr/local/bin/renew_certificates.sh
 
 # Adicionar o cron job para renovação do certificado
